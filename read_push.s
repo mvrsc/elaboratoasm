@@ -44,9 +44,11 @@ conta_p:	#conta quanti prodotti ho inserito da passare come valore per il SORTIN
 
 
 .section .text			#### cambiare in function
-	.global _start
+	.global read_push
+	
+.type read_push, @function
 
-_start:
+read_push:
 
 ##########################################################
 
@@ -55,7 +57,8 @@ _start:
 ##########################################################
 
 	movl $5, %eax #syscall apri file
-	leal filename, %ebx #indirizzo del file in ebx
+	#l'indirizzo del file è stato messo in ebx dal chiamante
+	#//leal filename, %ebx #indirizzo del file in ebx
 	xorl %ecx, %ecx #azzero ecx perche' read only
 	int $0x80
 	
@@ -167,15 +170,22 @@ close_file:
 	movl $6, %eax # SYS CLOSE
 	movl fd, %ebx # chiudi questo file qua
 	int  $0x80
+	
+	movl conta_p, %edi #metto la lunghezza in edi per chiamare l'algoritmo di sorting
+	
+	call hpf
+	
+	ret
 
 #############################
 
 #		CHIUDI PROGRAMMA
 
 #############################
-
+/*
 fine:
   movl $1, %eax
   movl $0, %ebx
   int $0x80
+  */
   
