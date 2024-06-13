@@ -131,13 +131,14 @@ scadenza:
 	
 
 fine_riga:		# push dei valori letti sullo stack
-	movl num, %eax
-	movl %eax, prior
-	movb prior, %ah
-	movb scad, %al
-	pushw %ax	
-	movb dur, %ah
+	
 	movb id, %al
+ 	movb dur, %ah
+	pushw %ax	
+ 	movl num, %eax
+	movl %eax, prior
+	movb scad, %al
+ 	movb prior, %ah
 	pushw %ax	
 	movl $0, conta_c #azzero contatore campi letti
 	movl $0, num #azzero num
@@ -152,12 +153,14 @@ fine_file:	# push dei valori letti sullo stack e fine read_char loop
 #eventualmente invertire ordine (vedere ordine nel sorting)
 	movl num, %eax
 	movl %eax, prior
-	movb prior, %ah
-	movb scad, %al
-	pushw %ax	
-	movb dur, %ah
 	movb id, %al
-	pushw %ax
+ 	movb dur, %ah
+	pushw %ax	
+ 	movl num, %eax
+	movl %eax, prior
+	movb scad, %al
+ 	movb prior, %ah
+	pushw %ax	
 	incl conta_p	#incremento numero prodotti caricati
 
 #############################
