@@ -39,10 +39,6 @@ conta_c:	#contatore dei campi letti per fare pushw di AX su stack
 conta_p:	#conta quanti prodotti ho inserito da passare come valore per il SORTING (conta le push eseguite)
 	.long 0
 
-
- 
-
-
 .section .text			#### cambiare in function
 	.global read_push
 	
@@ -65,9 +61,8 @@ read_push:
 	int $0x80
 	
 	movl %eax, fd 	#indirizzo file in eax
-	
-	
-	cmp $0, %eax   #raggiunta la fine del file fa push degli ultimi due valori letti
+		
+	cmp $0, %eax   #in caso di errore apertura chiude file
 	jle close_file
 	
 
@@ -84,17 +79,17 @@ readchar_loop:
 	movl $char, %ecx #quello che leggi va messo in char
 	movl $1, %edx #leggi un solo carattere
 	int $0x80
-    cmp $0, %eax        # Controllo se ci sono errori o EOF
-    je fine_file     # all'EOF faccio push e chiudo
+	cmp $0, %eax        # Controllo se ci sono errori o EOF
+		je fine_file     # all'EOF faccio push e chiudo
 
 	xorl %ebx, %ebx
 	movb char, %bl 	#metto in bl il char letto dal file
 	cmp $13, %bl    #lavorando in windows mette sia 13 che 10 alla fine della linea (CRLF)
-	je readchar_loop
+		je readchar_loop
 	cmp $10, %bl	# vedo se e' stato letto il carattere '\n'
-	je fine_riga	# se ho letto \n vado alla push
+		je fine_riga	# se ho letto \n vado alla push
 	cmp $44, %bl    # vedo se e' stato letto il carattere ','
-	je fine_campo	# se ho letto ',' controllo quanti campi ho letto
+		je fine_campo	# se ho letto ',' controllo quanti campi ho letto
 
 	
 	subb $48, %bl            # converto il codice ASCII della cifra nel numero corrispondente
@@ -153,6 +148,8 @@ fine_riga:		# push dei valori letti sullo stack
 
 fine_file:	# push dei valori letti sullo stack e fine read_char loop
 #eventualmente invertire ordine (vedere ordine nel sorting)
+
+
 	movl num, %eax
 	movl %eax, prior
 	movb id, %ah
@@ -164,6 +161,7 @@ fine_file:	# push dei valori letti sullo stack e fine read_char loop
  	movb prior, %al
 	pushw %ax	
 	incl conta_p	#incremento numero prodotti caricati
+
 
 #############################
 
@@ -182,15 +180,5 @@ close_file:
 	
 	ret
 
-#############################
 
-#		CHIUDI PROGRAMMA
-
-#############################
-/*
-fine:
-  movl $1, %eax
-  movl $0, %ebx
-  int $0x80
-  */
   

@@ -1,10 +1,10 @@
 .section .data
-#testbench di 4 elementi
+#testbench di 6 elementi
 a:
-	.long 0b00000100000010100000110000000100 #4,10,12,4
+	.long 0b00000100000010100000110000000101 #4,10,12,5
 	
 b: 
-	.long 0b00001100000001110010000000000001 #12,7,32,1
+	.long 0b00001100000001110010000000000101 #12,7,32,5
 
 c:
 	.long 0b00000010000001100000100100001100 #2,6,9,12
@@ -25,10 +25,12 @@ len:
 
 
 .section .text
-	.global _start
+	.global hpf
 	
-_start:
+.type hpf, @function
 	
+hpf:
+	/*
 	###################
 	#CARICO IL TESTBENCH NELLO STACK
 
@@ -43,7 +45,7 @@ _start:
 	movl e, %eax
 	pushl %eax
 	movl f, %eax
-	pushl %eax
+	pushl %eax */
 	
 	#################################################
 	#RICERCA DELLA PRIORITA' MASSIMA
@@ -58,7 +60,8 @@ _start:
 	#nell'indirizzo puntato da ecx 
 	#poi incrementiamo ecx e continuiamo la ricerca
 
-	movl len, %edi 	#uso edi per salvare il mio indice massimo
+	#movl len, %edi 	#uso edi per salvare il mio indice massimo
+	popl %esi
 	xorl %ecx, %ecx #azzero ecx che mi servirà da contatore
 
 
@@ -71,6 +74,7 @@ loop_esterno:
 loop_interno:
 	movl (%esp, %eax, 4), %edx #carico in edx il valore da confrontare con il nostro minimo corrente
 	cmpb %dl, %bl #confronto questi due registri perché mi interessa il campo PRIORITA'
+		je caso_uguale
 		jl nuovo_massimo		
 	continua:
 	inc %eax 
@@ -81,6 +85,12 @@ loop_interno:
 nuovo_massimo:
 	xchg (%esp, %eax, 4), %ebx
 	jmp continua
+	
+caso_uguale:
+	cmpb %dh, %bh #faccio il confronto nel campo SCADENZA se ho priorità uguale
+		jg nuovo_massimo
+	jmp continua
+
 
 uscita_loop_interno:
 	movl %ebx, (%esp, %ecx, 4) #salvo il valore trovato nell'indirizzo indicato da ecx
@@ -88,16 +98,14 @@ uscita_loop_interno:
 	jmp loop_esterno
 
 fine:
+/*	popl %eax
 	popl %eax
 	popl %eax
 	popl %eax
 	popl %eax
-	popl %eax
-	popl %eax
-	#######################
-	#CHIUDI PROGRAMMA
-	movl $1, %eax # exit(0)
-	movl $0, %ebx
-	int  $0x80
+	popl %eax*/
+	
+	pushl %esi	
+	ret
 	
 	
