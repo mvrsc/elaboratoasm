@@ -50,6 +50,8 @@ conta_p:	#conta quanti prodotti ho inserito da passare come valore per il SORTIN
 
 read_push:
 
+	popl %edi #salvo in edi l'indirizzo dell'istruzione da chiamare a fine funzione
+
 ##########################################################
 
 #				APRI FILE	
@@ -174,9 +176,9 @@ close_file:
 	movl fd, %ebx # chiudi questo file qua
 	int  $0x80
 	
-	movl conta_p, %edi #metto la lunghezza in edi per chiamare l'algoritmo di sorting
+	pushl %edi #rimetto in cima allo stack l'indirizzo della funzione da chiamare
 	
-	call hpf
+	movl conta_p, %edi #metto la lunghezza in edi per chiamare l'algoritmo di sorting
 	
 	ret
 
