@@ -32,7 +32,7 @@ conclusione:
 conclusione_len:
 	.long . - conclusione
 penalty_str:
-	.ascii "Penalty: ""
+	.ascii "Penalty: "
 penalty_len:
 	.long . - penalty_str
 
@@ -120,7 +120,7 @@ stampa_conclusione:
 	movl    conclusione_len, %edx
 	int $0x80
 	movl tempo, %eax
-	decl %eax #perche' conta anche lo slot 0
+		#decl %eax #perche' conta anche lo slot 0
 	call itoa
 	#stampa \n
 	movl   $4, %eax
