@@ -12,6 +12,10 @@ hpf.o: hpf.s
 read_push.o: read_push.s
 	as --32 -gstabs -o read_push.o read_push.s
 	
+clean:
+	rm -f *.o
+	rm -f pianificatore
+	
 	
 
 	

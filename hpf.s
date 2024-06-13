@@ -1,28 +1,4 @@
 .section .data
-#testbench di 6 elementi
-a:
-	.long 0b00000100000010100000110000000101 #4,10,12,5
-	
-b: 
-	.long 0b00001100000001110010000000000101 #12,7,32,5
-
-c:
-	.long 0b00000010000001100000100100001100 #2,6,9,12
-
-d:
-	.long 0b00000011000010000000110000001000 #3,8,12,8
-
-e:
-	.long 0b00010111000100000000001000000101 #23,16,2,5
-
-f:
-	.long 0b00001100010001100001010100000011 #12,70,21,3
-
-	
-len: 
-	.long 6 #
-
-
 
 .section .text
 	.global hpf
@@ -30,22 +6,6 @@ len:
 .type hpf, @function
 	
 hpf:
-	/*
-	###################
-	#CARICO IL TESTBENCH NELLO STACK
-
-	movl a, %eax
-	pushl %eax
-	movl b, %eax
-	pushl %eax
-	movl c, %eax
-	pushl %eax
-	movl d, %eax
-	pushl %eax
-	movl e, %eax
-	pushl %eax
-	movl f, %eax
-	pushl %eax */
 	
 	#################################################
 	#RICERCA DELLA PRIORITA' MASSIMA
@@ -59,9 +19,9 @@ hpf:
 	#quando eax raggiunge il valore limite in edi salviamo il valore trovato
 	#nell'indirizzo puntato da ecx 
 	#poi incrementiamo ecx e continuiamo la ricerca
+	#la dimensione dello stack da ordinare deve essere stato messo in EDI dall chiamante
 
-	#movl len, %edi 	#uso edi per salvare il mio indice massimo
-	popl %esi
+	popl %esi #salvo in esi l'indirizzo dell'istruzione di ritorno
 	xorl %ecx, %ecx #azzero ecx che mi servirà da contatore
 
 
@@ -98,12 +58,6 @@ uscita_loop_interno:
 	jmp loop_esterno
 
 fine:
-/*	popl %eax
-	popl %eax
-	popl %eax
-	popl %eax
-	popl %eax
-	popl %eax*/
 	
 	pushl %esi	
 	ret

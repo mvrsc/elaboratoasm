@@ -80,7 +80,7 @@ readchar_loop:
 	movl $1, %edx #leggi un solo carattere
 	int $0x80
 	cmp $0, %eax        # Controllo se ci sono errori o EOF
-		je fine_file     # all'EOF faccio push e chiudo
+		je fine_file     
 
 	xorl %ebx, %ebx
 	movb char, %bl 	#metto in bl il char letto dal file
@@ -120,7 +120,6 @@ durata:
 	jmp readchar_loop
 
 scadenza:
-	#incl conta_c
 	movl num, %eax
 	movl %eax, scad
 	movl $0, num #azzero num
@@ -150,6 +149,7 @@ fine_file:	# push dei valori letti sullo stack e fine read_char loop
 #eventualmente invertire ordine (vedere ordine nel sorting)
 
 
+/* QUESTA PARTE NON SERVE PER FILE DI TESTO FORMATTATI PER LINUX
 	movl num, %eax
 	movl %eax, prior
 	movb id, %ah
@@ -161,6 +161,7 @@ fine_file:	# push dei valori letti sullo stack e fine read_char loop
  	movb prior, %al
 	pushw %ax	
 	incl conta_p	#incremento numero prodotti caricati
+*/
 
 
 #############################
