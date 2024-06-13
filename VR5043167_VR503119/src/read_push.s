@@ -19,7 +19,7 @@
 .section .data
 
 err_file: 
-	.string "Errore nell'apertura del file"	
+	.string "Errore nell'apertura del file\n"	
 err_file_len: 
 	.long  . -err_file
 fd:
@@ -189,8 +189,7 @@ file_error:
 	leal err_file, %ecx # metti il messaggio in ECX
 	movl err_file_len, %edx #lunghezza del messaggio in EDX
 	int  $0x80
-	movl $0, %edi #lo uso come codice di errore per la funzione chiamante
-	
+	movl $0, %edi #lo uso come codice di errore per la funzione chiamante	
 	jmp EXIT
 
 
