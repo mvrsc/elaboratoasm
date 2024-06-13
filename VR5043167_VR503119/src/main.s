@@ -6,18 +6,30 @@ inizio_len:
 	.long . -inizio
 	
 err_input:
-	.string "hai inserito una combinazione di caratteri non valida\n"
+	.string "hai inserito un carattere non valido\n"
 err_input_len:
 	.long . -err_input
+	
+err_param:
+	.string "Errore! Questo programma richiede esattamente un file di testo come parametro\n"
+err_param_len:
+	.long . -err_param
 
 .section .bss
 input:
-	.byte 0
+	.string ""
 
 .section .text
 	.global _start
 
 _start:
+	####################
+	#CONTROLLA VALIDITA' PARAMETRO
+	movl (%esp), %ebx
+	cmpl $2, %ebx
+	jne param_error
+	
+	
 	####################
 	#LEGGI PARAMETRO
 
@@ -26,6 +38,8 @@ _start:
 	movl (%ecx), %ebx #l'indirizzo del file è ora in ebx
 	
 	call read_push
+	cmpl $0, %edi #esco se la funzione mi ha restituito un errore
+	je EXIT
 	
 selezione:	
 	########################
@@ -44,10 +58,10 @@ selezione:
 	leal input, %ecx # metti quello che leggi in input
 	movl $1, %edx #leggi un carattere solo
 	int  $0x80
+	
 
 	########################
 	#SELEZIONE
-
 	cmpb $49, input
 		je sel_EDF
 	cmpb $50, input
@@ -70,10 +84,10 @@ calcola:
 	call output
 	
 EXIT:
-
 	movl $1, %eax # exit(0)
 	movl $0, %ebx
 	int  $0x80
+
 
 	#######################
 	#TORNA AL MENU SE LA SELEZIONE NON E' VALIDA
@@ -86,5 +100,13 @@ input_error:
 	jmp selezione
 	
 	
-
+	#######################
+	#ESCI SE NON HAI UN FILE DA APRIRE
+param_error:
+	movl $4, %eax # 4 = syscall WRITE
+	movl $1, %ebx # 1 = write to standard output
+	leal err_param, %ecx # metti il messaggio in ECX
+	movl err_param_len, %edx #lunghezza del messaggio in EDX
+	int  $0x80
+	jmp EXIT
 

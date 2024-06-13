@@ -18,8 +18,10 @@
 
 .section .data
 
-filename: 
-	.string "ordini.txt"	
+err_file: 
+	.string "Errore nell'apertura del file"	
+err_file_len: 
+	.long  . -err_file
 fd:
 	.long 0	
 char:
@@ -54,16 +56,16 @@ read_push:
 
 ##########################################################
 
-	movl $5, %eax #syscall apri file
 	#l'indirizzo del file è stato messo in ebx dal chiamante
-	#//leal filename, %ebx #indirizzo del file in ebx
+	movl $5, %eax #syscall apri file
+
 	xorl %ecx, %ecx #azzero ecx perche' read only
 	int $0x80
 	
 	movl %eax, fd 	#indirizzo file in eax
 		
-	cmp $0, %eax   #in caso di errore apertura chiude file
-	jle close_file
+	cmp $0, %eax   #in caso di errore apertura esce
+	jle file_error
 	
 
 
@@ -175,11 +177,21 @@ close_file:
 	movl fd, %ebx # chiudi questo file qua
 	int  $0x80
 	
-	pushl %ebp #rimetto in cima allo stack l'indirizzo della funzione da chiamare
-	
 	movl conta_p, %edi #metto la lunghezza in edi per chiamare l'algoritmo di sorting
 	
+EXIT:
+	pushl %ebp #rimetto in cima allo stack l'indirizzo della funzione da chiamare	
 	ret
+	
+file_error:
+	movl $4, %eax # 4 = syscall WRITE
+	movl $1, %ebx # 1 = write to standard output
+	leal err_file, %ecx # metti il messaggio in ECX
+	movl err_file_len, %edx #lunghezza del messaggio in EDX
+	int  $0x80
+	movl $0, %edi #lo uso come codice di errore per la funzione chiamante
+	
+	jmp EXIT
 
 
   
