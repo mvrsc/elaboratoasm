@@ -17,7 +17,7 @@ err_param_len:
 
 .section .bss
 input:
-	.string ""
+	.byte 
 
 .section .text
 	.global _start
@@ -54,7 +54,7 @@ selezione:
 	movl $3, %eax # 3 = syscall READ
 	movl $0, %ebx # 0 = read from keyboard
 	leal input, %ecx # metti quello che leggi in input
-	movl $1, %edx #leggi un carattere solo
+	movl $20, %edx #leggo un buffer lungo di caratteri per evitare trailing input
 	int  $0x80
 	
 
@@ -83,7 +83,6 @@ EXIT:
 	movl $1, %eax # exit(0)
 	movl $0, %ebx
 	int  $0x80
-
 
 	#######################
 	#TORNA AL MENU SE LA SELEZIONE NON E' VALIDA
