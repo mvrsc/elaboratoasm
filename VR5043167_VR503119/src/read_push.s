@@ -106,6 +106,12 @@ fine_campo:
 	jne durata
 	incl conta_c	# incremento numero campi lette
 	movl num, %eax
+ # gestione errori nei valori
+ 	cmp $1,%eax
+	jl file_error
+	cmp $127, %eax
+	jg file_error
+ # fine gestione errore nei valori
 	movl %eax, id	
 	movl $0, num #azzero num
 	jmp readchar_loop # leggo il carattere successivo (cioe' la campo successiva)
@@ -115,23 +121,46 @@ durata:
 	jne scadenza
 	incl conta_c # incremento numero campi letti
 	movl num, %eax
+  # gestione errori nei valori
+ 	cmp $1,%eax
+	jl file_error
+	cmp $10, %eax
+	jg file_error
+ # fine gestione errore nei valori
 	movl %eax, dur
 	movl $0, num #azzero num
 	jmp readchar_loop
 
 scadenza:
-	movl num, %eax
+	cmpl $2, conta_c
+	jne file_error
+ 	movl num, %eax
+  # gestione errori nei valori
+ 	cmp $1,%eax
+	jl file_error
+	cmp $100, %eax
+	jg file_error
+ # fine gestione errore nei valori
 	movl %eax, scad
 	movl $0, num #azzero num
 	jmp readchar_loop	
 	
 
 fine_riga:		# push dei valori letti sullo stack
-	
+  # gestione errori nei valori (riga incompleta)
+ 	cmpl $3, conta_c
+	jne file_error
+   # fine gestione errori
 	movb id, %ah
  	movb dur, %al
 	pushw %ax	
  	movl num, %eax
+    # gestione errori nei valori
+ 	cmp $1,%eax
+	jl file_error
+	cmp $5, %eax
+	jg file_error
+ # fine gestione errore nei valori
 	movl %eax, prior
 	movb scad, %ah
  	movb prior, %al
