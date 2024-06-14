@@ -28,8 +28,8 @@ _start:
 	movl (%esp), %ebx
 	cmpl $2, %ebx
 	jne param_error
-	
-reset:	
+
+restart:
 	####################
 	#LEGGI PARAMETRO
 	movl %esp, %ecx #metti l'indirizzo dello stack in ecx
@@ -46,11 +46,7 @@ reset:
 selezione:	
 	########################
 	#SCRIVI MESSAGGIO	
-	movl $4, %eax # 4 = syscall WRITE
-	movl $1, %ebx # 1 = write to standard output
-	leal inizio, %ecx # metti il messaggio in ECX
-	movl inizio_len, %edx #lunghezza del messaggio in EDX
-	int  $0x80
+	call print_menu
 
 	
 	########################
@@ -73,7 +69,7 @@ selezione:
 	jmp input_error #se l'input non è valido comunicalo all'utente
 	
 sel_EDF:
-	call edf
+	call edf	
 	jmp calcola	
 	
 sel_HPF:	
@@ -81,10 +77,7 @@ sel_HPF:
 
 calcola:
 	call output
-	xorl %edi, %edi
-	xorl %eax, %eax
-	xorl %ecx, %ecx
-	jmp reset
+	jmp  restart
 	
 EXIT:
 	movl $1, %eax # exit(0)
@@ -95,21 +88,12 @@ EXIT:
 	#######################
 	#TORNA AL MENU SE LA SELEZIONE NON E' VALIDA
 input_error:
-	movl $4, %eax # 4 = syscall WRITE
-	movl $1, %ebx # 1 = write to standard output
-	leal err_input, %ecx # metti il messaggio in ECX
-	movl err_input_len, %edx #lunghezza del messaggio in EDX
-	int  $0x80
+	call print_input_err
 	jmp selezione
-	
 	
 	#######################
 	#ESCI SE NON HAI UN FILE DA APRIRE O NE HAI TROPPI
 param_error:
-	movl $4, %eax # 4 = syscall WRITE
-	movl $1, %ebx # 1 = write to standard output
-	leal err_param, %ecx # metti il messaggio in ECX
-	movl err_param_len, %edx #lunghezza del messaggio in EDX
-	int  $0x80
+	call print_param_err
 	jmp EXIT
 

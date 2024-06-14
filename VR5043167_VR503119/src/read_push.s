@@ -18,10 +18,6 @@
 
 .section .data
 
-err_file: 
-	.string "Errore nell'apertura del file\n"	
-err_file_len: 
-	.long  . -err_file
 fd:
 	.long 0	
 char:
@@ -186,11 +182,7 @@ EXIT:
 	ret
 	
 file_error:
-	movl $4, %eax # 4 = syscall WRITE
-	movl $1, %ebx # 1 = write to standard output
-	leal err_file, %ecx # metti il messaggio in ECX
-	movl err_file_len, %edx #lunghezza del messaggio in EDX
-	int  $0x80
+	call print_file_err
 	movl $0, %edi #lo uso come codice di errore per la funzione chiamante	
 	jmp EXIT
 
