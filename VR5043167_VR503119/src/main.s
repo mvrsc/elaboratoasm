@@ -29,28 +29,30 @@ _start:
 	cmpl $2, %ebx
 	jne param_error
 	
-	
+reset:	
 	####################
 	#LEGGI PARAMETRO
-
 	movl %esp, %ecx #metti l'indirizzo dello stack in ecx
 	addl $8, %ecx #scorri indietro di 2 posizioni
 	movl (%ecx), %ebx #l'indirizzo del file è ora in ebx
-	
+
+
+	####################
+	#SCRIVI IL FILE NELLO STACK	
 	call read_push
 	cmpl $0, %edi #esco se la funzione mi ha restituito un errore
 	je EXIT
 	
 selezione:	
 	########################
-	#SCRIVI MESSAGGIO
-	
+	#SCRIVI MESSAGGIO	
 	movl $4, %eax # 4 = syscall WRITE
 	movl $1, %ebx # 1 = write to standard output
 	leal inizio, %ecx # metti il messaggio in ECX
 	movl inizio_len, %edx #lunghezza del messaggio in EDX
 	int  $0x80
 
+	
 	########################
 	#LEGGI INPUT UTENTE
 	movl $3, %eax # 3 = syscall READ
@@ -67,12 +69,9 @@ selezione:
 	cmpb $50, input
 		je sel_HPF
 	cmpb $51, input
-		je EXIT
+		je EXIT	
+	jmp input_error #se l'input non è valido comunicalo all'utente
 	
-	jmp input_error
-		
-	
-
 sel_EDF:
 	call edf
 	jmp calcola	
@@ -82,6 +81,10 @@ sel_HPF:
 
 calcola:
 	call output
+	xorl %edi, %edi
+	xorl %eax, %eax
+	xorl %ecx, %ecx
+	jmp reset
 	
 EXIT:
 	movl $1, %eax # exit(0)
@@ -101,7 +104,7 @@ input_error:
 	
 	
 	#######################
-	#ESCI SE NON HAI UN FILE DA APRIRE
+	#ESCI SE NON HAI UN FILE DA APRIRE O NE HAI TROPPI
 param_error:
 	movl $4, %eax # 4 = syscall WRITE
 	movl $1, %ebx # 1 = write to standard output

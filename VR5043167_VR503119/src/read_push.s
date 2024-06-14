@@ -49,7 +49,9 @@ conta_p:	#conta quanti prodotti ho inserito da passare come valore per il SORTIN
 read_push:
 
 	popl %ebp #salvo in edi l'indirizzo dell'istruzione da chiamare a fine funzione
-
+	movl $0, conta_p
+	
+	
 ##########################################################
 
 #				APRI FILE	

@@ -47,6 +47,9 @@ penalty_len:
 
 output:
 
+	movl $0, penalty
+	movl $0, tempo
+
 ##########################################################
 # pop prodotto
 # stampa id pianificazione
