@@ -1,20 +1,3 @@
-.section .data
-
-inizio:
-	.string "Inserisci 1 per EDF, 2 per HPF, 3 per uscire.\n"
-inizio_len:
-	.long . -inizio
-	
-err_input:
-	.string "hai inserito un carattere non valido\n"
-err_input_len:
-	.long . -err_input
-	
-err_param:
-	.string "Errore! Questo programma richiede esattamente un file di testo come parametro\n"
-err_param_len:
-	.long . -err_param
-
 .section .bss
 input:
 	.byte 
@@ -36,19 +19,17 @@ restart:
 	addl $8, %ecx #scorri indietro di 2 posizioni
 	movl (%ecx), %ebx #l'indirizzo del file è ora in ebx
 
-
 	####################
 	#SCRIVI IL FILE NELLO STACK	
 	call read_push
 	cmpl $0, %edi #esco se la funzione mi ha restituito un errore
-	je EXIT
+	je EXIT #il messaggio di errore è stato stampato dalla funzione
 	
 selezione:	
 	########################
 	#SCRIVI MESSAGGIO	
 	call print_menu
 
-	
 	########################
 	#LEGGI INPUT UTENTE
 	movl $3, %eax # 3 = syscall READ
@@ -57,7 +38,6 @@ selezione:
 	movl $20, %edx #leggo un buffer lungo di caratteri per evitare trailing input
 	int  $0x80
 	
-
 	########################
 	#SELEZIONE
 	cmpb $49, input
@@ -72,7 +52,7 @@ sel_EDF:
 	call edf	
 	jmp calcola	
 	
-sel_HPF:	
+sel_HPF:
 	call hpf
 
 calcola:
@@ -84,15 +64,15 @@ EXIT:
 	movl $0, %ebx
 	int  $0x80
 
+input_error:
 	#######################
 	#TORNA AL MENU SE LA SELEZIONE NON E' VALIDA
-input_error:
 	call print_input_err
 	jmp selezione
 	
+param_error:
 	#######################
 	#ESCI SE NON HAI UN FILE DA APRIRE O NE HAI TROPPI
-param_error:
 	call print_param_err
 	jmp EXIT
 

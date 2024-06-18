@@ -58,7 +58,7 @@ uscita_loop_interno:
 	jmp loop_esterno
 
 fine:
-	
+	call print_hpf #stampo il nome dell'algoritmo che sto usando
 	pushl %ebp	
 	ret
 	

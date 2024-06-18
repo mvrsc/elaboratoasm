@@ -14,6 +14,7 @@ edf:
 	#TRANNE CHE LE POSIZIONI DI ALCUNI REGISTRI SONO STATE SCAMBIATE
 
 	popl %ebp #salvo in ebp l'indirizzo dell'istruzione di ritorno
+
 	xorl %ecx, %ecx #azzero ecx che mi servirà da contatore
 
 
@@ -50,7 +51,7 @@ uscita_loop_interno:
 	jmp loop_esterno
 
 fine:
-	
+	call print_edf #stampo il nome dell'algoritmo che sto usando
 	pushl %ebp	
 	ret
 	

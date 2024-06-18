@@ -37,7 +37,7 @@ conta_c:	#contatore dei campi letti per fare pushw di AX su stack
 conta_p:	#conta quanti prodotti ho inserito da passare come valore per il SORTING (conta le push eseguite)
 	.long 0
 
-.section .text			#### cambiare in function
+.section .text			
 	.global read_push
 	
 .type read_push, @function
@@ -60,7 +60,7 @@ read_push:
 	xorl %ecx, %ecx #azzero ecx perche' read only
 	int $0x80
 	
-	movl %eax, fd 	#indirizzo file in eax
+	movl %eax, fd 	#indirizzo file in fd
 		
 	cmp $0, %eax   #in caso di errore apertura esce
 	jle file_error
@@ -104,14 +104,16 @@ fine_campo:
 # se ho letto ',' controllo quanti campi ho letto per capire che variabile valorizzare
 	cmpl $0, conta_c		
 	jne durata
-	incl conta_c	# incremento numero campi lette
+	incl conta_c	# incremento numero campi letti
 	movl num, %eax
+	
  # gestione errori nei valori
  	cmp $1,%eax
-	jl file_error
+	jl value_error
 	cmp $127, %eax
-	jg file_error
+	jg value_error
  # fine gestione errore nei valori
+ 
 	movl %eax, id	
 	movl $0, num #azzero num
 	jmp readchar_loop # leggo il carattere successivo (cioe' la campo successiva)
@@ -121,26 +123,31 @@ durata:
 	jne scadenza
 	incl conta_c # incremento numero campi letti
 	movl num, %eax
+	
   # gestione errori nei valori
  	cmp $1,%eax
-	jl file_error
+	jl value_error
 	cmp $10, %eax
-	jg file_error
+	jg value_error
  # fine gestione errore nei valori
+ 
 	movl %eax, dur
 	movl $0, num #azzero num
 	jmp readchar_loop
 
 scadenza:
 	cmpl $2, conta_c
-	jne file_error
+	jne format_error  #copre un po' di errori generici, virgolebrutte.txt e sfora.txt
+	incl conta_c # incremento numero campi letti
  	movl num, %eax
+ 	
   # gestione errori nei valori
  	cmp $1,%eax
-	jl file_error
+	jl value_error
 	cmp $100, %eax
-	jg file_error
+	jg value_error
  # fine gestione errore nei valori
+ 
 	movl %eax, scad
 	movl $0, num #azzero num
 	jmp readchar_loop	
@@ -149,7 +156,7 @@ scadenza:
 fine_riga:		# push dei valori letti sullo stack
   # gestione errori nei valori (riga incompleta)
  	cmpl $3, conta_c
-	jne file_error
+	jne field_error
    # fine gestione errori
 	movb id, %ah
  	movb dur, %al
@@ -157,9 +164,9 @@ fine_riga:		# push dei valori letti sullo stack
  	movl num, %eax
     # gestione errori nei valori
  	cmp $1,%eax
-	jl file_error
+	jl value_error
 	cmp $5, %eax
-	jg file_error
+	jg value_error
  # fine gestione errore nei valori
 	movl %eax, prior
 	movb scad, %ah
@@ -202,18 +209,39 @@ fine_file:	# push dei valori letti sullo stack e fine read_char loop
 close_file:	
 	movl $6, %eax # SYS CLOSE
 	movl fd, %ebx # chiudi questo file qua
-	int  $0x80
-	
+	int  $0x80	
 	movl conta_p, %edi #metto la lunghezza in edi per chiamare l'algoritmo di sorting
 	
 EXIT:
 	pushl %ebp #rimetto in cima allo stack l'indirizzo della funzione da chiamare	
 	ret
+#############################
+
+#		ERROR HANDLERS
+
+#############################
 	
 file_error:
 	call print_file_err
 	movl $0, %edi #lo uso come codice di errore per la funzione chiamante	
 	jmp EXIT
+	
+value_error:
+	call print_value_err
+	movl $0, %edi #lo uso come codice di errore per la funzione chiamante	
+	jmp EXIT
+
+field_error:
+	call print_field_err
+	movl $0, %edi #lo uso come codice di errore per la funzione chiamante	
+	jmp EXIT
+
+format_error:
+	call print_format_err
+	movl $0, %edi #lo uso come codice di errore per la funzione chiamante	
+	jmp EXIT
+	
+
 
 
   
